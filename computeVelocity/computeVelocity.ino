@@ -2,7 +2,7 @@
 
 long mA1, mA2, mB1, mB2;
 long up_times_A[3]={0,0,0},up_times_B[3]={0,0,0};
-int indexA = 0, indexB = 0;
+int indexA = 0, indexB = 0, i=0;
 float speed = 0;
 int pwm = 0;
 char dataComing= 0;
@@ -11,14 +11,14 @@ bool motorAenabled = false, motorBenabled = false, firstTime = true;
 void encMotorA(){// Interrupt Motor A
   mA1 = micros();
   up_times_A[indexA]=mA1-mA2;
-  indexA=(indexA+1)%3
+  indexA=(indexA+1)%3;
   mA2 = mA1;
 }
 
 void encMotorB(){// Interrupt Motor B
   mB1 = micros();
   up_times_B[indexB]=mB1-mB2;
-  indexB=(indexB+1)%3
+  indexB=(indexB+1)%3;
   mB2 = mB1;
 }
 
@@ -29,11 +29,13 @@ void setup() {
   
   // put your setup code here, to run once:
   MYSERIAL.begin(BAUDRATE);
-  pinMode(INTERRUPT_PIN,INPUT);
-  digitalWrite(INTERRUPT_PIN,HIGH);
+  pinMode(INTERRUPT_PIN_MOTOR_A,INPUT);
+  digitalWrite(INTERRUPT_PIN_MOTOR_A,HIGH);
+  pinMode(INTERRUPT_PIN_MOTOR_B,INPUT);
+  digitalWrite(INTERRUPT_PIN_MOTOR_B,HIGH);
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN_MOTOR_A),encMotorA,RISING);
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN_MOTOR_B),encMotorB,RISING);
-  to= millis();
+//  to= millis();
 
   MYSERIAL.println("This program computes the velocity of a motor,");
   MYSERIAL.println("the program will print 100 values of velocities");
