@@ -1,16 +1,10 @@
-
-/* This program it is used to compute the velocity graph of a DC motor for different values of PWM.
- * Before run it, please check pins.h file to configure arduino pins and the main characteristics
- * of your DC Motor.
- */
-
-#include "pins.h" 
+#include "pins.h"
 
 long mA1, mA2, mB1, mB2;
 long up_times_A[3]={0,0,0},up_times_B[3]={0,0,0};
-int indexA = 0, indexB = 0, i=0, j;
+int indexA = 0, indexB = 0, i=0, j, count = 0;
 float speed = 0;
-int pwm = 0;
+int pwm = 135;
 char dataComing= 0;
 bool motorAenabled = false, motorBenabled = false, firstTime = true;
 float timeBetweenPulses; // (us/count)
@@ -30,7 +24,6 @@ void encMotorB(){// Interrupt Motor B
 }
 
 void setup() {
-  
   pinMode(ENB, OUTPUT);
   pinMode(ENA, OUTPUT);
   
@@ -43,66 +36,71 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN_MOTOR_A),encMotorA,RISING);
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN_MOTOR_B),encMotorB,RISING);
   // Print information in serial port
-  MYSERIAL.println("This program computes the velocity of a motor,");
-  MYSERIAL.println("the program will print 100 values of velocities");
+  MYSERIAL.println("This program shows the velocity for a value of pwm,");
+  MYSERIAL.println("between 155 and 235"); // Max 235 to avoid saturate the motor
   MYSERIAL.println();
   MYSERIAL.print("Type any character to begin the program: ");
-  while(MYSERIAL.read()<0); // Wait until a character will be type
-  
-  
-  
+  while(MYSERIAL.read()<0); // Wait until a character will be type  
 }
 
 void loop() {
-
+  
    if(firstTime){ // Choose if you are gonna use motor A or B
-    MYSERIAL.print("Type A or B for taking data from one of the motors: A");
+    MYSERIAL.print("Type A or B for taking data from one of the motors: ");
     while(dataComing == 0);
     MYSERIAL.println(dataComing);
     switch(dataComing){ // Switch Motor A or B
       case 'A':
         digitalWrite(ENB,LOW);
         digitalWrite(ENA,HIGH);
+        analogWrite(IN2,0);
+        analogWrite(IN1,pwm);
         motorAenabled = true;
+        delay(2000); // To stabalize the motor
       break;
   
       case 'B':
         digitalWrite(ENB,HIGH);
         digitalWrite(ENA,LOW);
+        analogWrite(IN4,0);
+        analogWrite(IN3,pwm);
         motorBenabled = true;
-      break;
+        delay(2000); // To stabalize the motor
+      break;    
     }
     firstTime = false;
-   }
+  }
 
-
-
-  if(motorAenabled && !motorBenabled){
-    analogWrite(IN2,0);
-    analogWrite(IN1,pwm);
-    delay(100);
-    for(j = 0; j<3; j++){
-      timeBetweenPulses = timeBetweenPulses + up_times_A[i];
-    }
-    timeBetweenPulses = timeBetweenPulses/3;
+   if(motorAenabled && !motorBenabled){
+      analogWrite(IN2,0);
+      analogWrite(IN1,pwm);
+      for(j = 0; j<3; j++){
+        timeBetweenPulses = timeBetweenPulses + up_times_A[i];
+      }
+      timeBetweenPulses = timeBetweenPulses/3;
   }else if (!motorAenabled && motorBenabled){
-    analogWrite(IN4,0);
-    analogWrite(IN3,pwm);
-    delay(100);
-    for(j = 0; j<3; j++){
-      timeBetweenPulses = timeBetweenPulses + up_times_B[i];
+      analogWrite(IN4,0);
+      analogWrite(IN3,pwm);
+      for(j = 0; j<3; j++){
+        timeBetweenPulses = timeBetweenPulses + up_times_B[i];
+      }
+      timeBetweenPulses = timeBetweenPulses/3;
+  }
+
+ for(j=0;j < 1000; j++){
+    if(count >= 100){
+      if(pwm == 135) pwm = 235;
+      if(pwm == 235) pwm = 135;
+      j--;
+      count = 0;
     }
-    timeBetweenPulses = timeBetweenPulses/3;
-  }
- 
-  while (i <= 260){ // Plot 260 velocity values
-    if(pwm < 255){
-      pwm = pwm + 1;
-    }    
-    speed=MIN2MICROSECONDS/(COUNTS_PER_REVOLUTION*timeBetweenPulses); // Compute speed in rpm
-    MYSERIAL.println(speed); // Print speed in rpm 
-    i++;
-  }
+    else {  
+      speed=MIN2MICROSECONDS/(COUNTS_PER_REVOLUTION*timeBetweenPulses); // Compute speed in rpm    
+      MYSERIAL.println(speed);
+      delay(100);
+      count++;
+    }
+ }
 
 }
 
@@ -111,5 +109,3 @@ void serialEvent (){ // Serial Event to receive characters from serial port
     dataComing=MYSERIAL.read();
   }
 }
-
-
