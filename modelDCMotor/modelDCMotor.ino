@@ -1,5 +1,5 @@
 #include "pins.h"
-
+//pollada
 long mA1, mA2, mB1, mB2;
 long up_times_A[3]={0,0,0},up_times_B[3]={0,0,0};
 int indexA = 0, indexB = 0, i=0, j, count = 0;
