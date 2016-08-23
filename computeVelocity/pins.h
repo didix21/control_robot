@@ -1,6 +1,6 @@
 
 /* ==================== DEFINE PINS ==================== */
-#define INTERRUPT_PIN_MOTOR_A 2
+#define INTERRUPT_PIN_MOTOR_A 3
 #define INTERRUPT_PIN_MOTOR_B 2
 //Define PIN L298n
 #define ENA 5
