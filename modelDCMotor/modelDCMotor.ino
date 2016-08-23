@@ -4,7 +4,7 @@ long mA1, mA2, mB1, mB2;
 long up_times_A[3]={0,0,0},up_times_B[3]={0,0,0};
 int indexA = 0, indexB = 0, i=0, j, count = 0;
 float speed = 0;
-int pwm = 160;
+int pwm = 245;
 char dataComing= 0, dataDisplay;
 bool motorAenabled = false, motorBenabled = false, firstTime = true;
 float timeBetweenPulses; // (us/count)
@@ -96,20 +96,26 @@ void loop() {
   }
   
   if(motorAenabled || motorBenabled){
-     if(j < 1000){
+     if(j < 600){
         if(count < 100){
           speed=MIN2MICROSECONDS/(COUNTS_PER_REVOLUTION*timeBetweenPulses); // Compute speed in rpm    
-          MYSERIAL.println(timeBetweenPulses);
+          MYSERIAL.println(speed);
           count++;
+          //MYSERIAL.println(count);
           delay(100);
         }
         else {  
           if(pwm == 160) pwm = 245;
-          if(pwm == 245) pwm = 160;
+          else pwm = 160;
+         // MYSERIAL.println(pwm);
           j--;
           count = 0;
         }
         j++;
+        //MYSERIAL.println(j);
+     }
+     else {
+      pwm = 0;
      }
   }
 }
