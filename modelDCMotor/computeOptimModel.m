@@ -1,5 +1,8 @@
+close all
+clear all
 global y u t;
 load motorDreta.mat
+
 y = motorD(201:600,1);
 a = 1;
 
@@ -11,12 +14,12 @@ for j=1:(length(y)/100)
     switch a
         case 1
             for i=1+(j-1)*100:100+(j-1)*100
-                u(i)=245;
+                u(i)=p(1)*245^2+p(2)*245+p(3); % pasem 245 pwm a rpm 
             end
             a = 2;
         case 2
             for i=1+(j-1)*100:100+(j-1)*100
-                u(i)=165;
+                u(i)=p(1)*165^2+p(2)*165+p(3);
             end
             a = 1;
     end
@@ -48,4 +51,7 @@ D=0;
 
 sys_model=ss(A,B,C,D);
 [y_model,t] = lsim(sys_model,u,t);
-plot(y_model)
+plot(t,y_model);
+hold on
+plot(t,y);
+legend('y_model','y');
