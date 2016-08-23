@@ -4,7 +4,7 @@ long mA1, mA2, mB1, mB2;
 long up_times_A[3]={0,0,0},up_times_B[3]={0,0,0};
 int indexA = 0, indexB = 0, i=0, j, count = 0;
 float speed = 0;
-int pwm = 135;
+int pwm = 160;
 char dataComing= 0, dataDisplay;
 bool motorAenabled = false, motorBenabled = false, firstTime = true;
 float timeBetweenPulses; // (us/count)
@@ -37,8 +37,8 @@ void setup() {
   digitalWrite(INTERRUPT_PIN_MOTOR_B,HIGH);
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN_MOTOR_A),encMotorA,RISING);
   attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN_MOTOR_B),encMotorB,RISING);
-  analogWrite(ENA,pwm);
-  analogWrite(ENB,pwm);
+  analogWrite(ENA,0);
+  analogWrite(ENB,0);
   
   // Print information in serial port
   MYSERIAL.println("This program computes the velocity of a motor,");
@@ -62,6 +62,8 @@ void loop() {
       digitalWrite(IN4,LOW);
       motorAenabled = true;
       MYSERIAL.print(" MOTOR A ENABLED ");
+      analogWrite(ENA,pwm);
+      delay(2000);
     break;
     case 'B':
       digitalWrite(IN1,LOW);
@@ -70,6 +72,8 @@ void loop() {
       digitalWrite(IN4,HIGH);
       motorBenabled = true;
       MYSERIAL.print(" MOTOR B ENABLED ");
+      analogWrite(ENB,pwm);
+      delay(2000);
     break;
   }
 
@@ -100,8 +104,8 @@ void loop() {
           delay(100);
         }
         else {  
-          if(pwm == 135) pwm = 235;
-          if(pwm == 235) pwm = 135;
+          if(pwm == 160) pwm = 245;
+          if(pwm == 245) pwm = 160;
           j--;
           count = 0;
         }
