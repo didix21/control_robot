@@ -51,7 +51,10 @@ D=0;
 
 sys_model=ss(A,B,C,D);
 [y_model,t] = lsim(sys_model,u,t);
-plot(t,y_model);
+plot(t,y_model,'r');
 hold on
 plot(t,y);
-legend('y_model','y');
+title ('Gràfica de parametres estimats');
+xlabel ('Temps (Segons)');
+ylabel ('Velocitat');
+legend('y_m_o_d_e_l','y');
